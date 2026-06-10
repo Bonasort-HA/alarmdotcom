@@ -51,14 +51,18 @@ class BaseDevice(CoordinatorEntity):  # type: ignore
 
         self._attr_extra_state_attributes: MutableMapping[str, Any] = {}
 
-        self._attr_device_info = DeviceInfo(
-            {
-                "manufacturer": "Alarm.com",
-                "name": device.name,
-                "identifiers": {(DOMAIN, self._adc_id)},
-                "via_device": (DOMAIN, self._device.partition_id),
-            }
-        )
+        device_info: MutableMapping[str, Any] = {
+            "manufacturer": "Alarm.com",
+            "name": device.name,
+            "identifiers": {(DOMAIN, self._adc_id)},
+        }
+
+        # The panel itself has no parent partition (partition_id is None);
+        # referencing a non-existent via_device is deprecated in HA.
+        if (partition_id := self._device.partition_id) is not None:
+            device_info["via_device"] = (DOMAIN, partition_id)
+
+        self._attr_device_info = DeviceInfo(device_info)
 
     @property
     def device_type_name(self) -> str:
@@ -102,8 +106,10 @@ class BaseDevice(CoordinatorEntity):  # type: ignore
         self.async_write_ha_state()
 
         # LOGGER.debug("************** START DEVICE UPDATE *****************")
+        # Entity._friendly_name_internal() was removed in HA 2026.2 (core PR #162766).
+        name = self.name or getattr(self._device, "name", None) or self._adc_id
         LOGGER.info(
-            f"Updated {self.device_type_name} {self._friendly_name_internal()} ({self._adc_id}): {self.state}"
+            "Updated %s %s (%s): %s", self.device_type_name, name, self._adc_id, self.state
         )
         # LOGGER.debug(json.dumps(self._device.raw_attributes, indent=4, sort_keys=True))
         # LOGGER.debug("************** END DEVICE UPDATE *****************")

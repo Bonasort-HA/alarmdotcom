@@ -149,11 +149,8 @@ class Climate(HardwareBaseDevice, ClimateEntity):  # type: ignore
         else:
             self._attr_fan_mode = None
 
-        #
-        # Aux Heat
-        #
-
-        self._attr_is_aux_heat = self._device.state == libThermostat.DeviceState.AUX_HEAT
+        # Aux heat support (is_aux_heat / ClimateEntityFeature.AUX_HEAT) was
+        # removed from the HA climate entity model.
 
     async def async_set_hvac_mode(self, hvac_mode: HVACMode) -> None:
         """Set HVAC mode."""
@@ -233,7 +230,7 @@ class Climate(HardwareBaseDevice, ClimateEntity):  # type: ignore
         # SUPPORTED FEATURES
         #
 
-        supported_features = 0
+        supported_features = ClimateEntityFeature(0)
 
         if self._device.attributes.supports_setpoints:
             supported_features |= ClimateEntityFeature.TARGET_TEMPERATURE
@@ -244,8 +241,10 @@ class Climate(HardwareBaseDevice, ClimateEntity):  # type: ignore
         if self._device.attributes.supports_fan_mode:
             supported_features |= ClimateEntityFeature.FAN_MODE
 
-        if self._device.attributes.supports_heat_aux:
-            supported_features |= ClimateEntityFeature.AUX_HEAT
+        # ClimateEntityFeature.AUX_HEAT was removed from HA. HVACMode.OFF is
+        # always offered (see below), so TURN_OFF/TURN_ON must be declared for
+        # the climate.turn_on/turn_off services to keep working.
+        supported_features |= ClimateEntityFeature.TURN_OFF | ClimateEntityFeature.TURN_ON
 
         self._attr_supported_features = supported_features
 

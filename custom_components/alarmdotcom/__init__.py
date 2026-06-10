@@ -184,9 +184,11 @@ async def async_migrate_entry(hass: HomeAssistant, config_entry: ConfigEntry) ->
 
         v2_options["arm_code"] = str(arm_code) if (arm_code := config_entry.options.get("arm_code")) else ""
 
-        config_entry.version = 2
-
-        hass.config_entries.async_update_entry(config_entry, data={**config_entry.data}, options=v2_options)
+        # ConfigEntry.version must not be assigned directly (raises since HA 2026.x);
+        # pass it through async_update_entry instead.
+        hass.config_entries.async_update_entry(
+            config_entry, data={**config_entry.data}, options=v2_options, version=2
+        )
 
         LOGGER.info("Migration to version %s successful", config_entry.version)
 
@@ -238,8 +240,6 @@ async def async_migrate_entry(hass: HomeAssistant, config_entry: ConfigEntry) ->
 
         v3_options[CONF_ARM_NIGHT] = new_arm_night
 
-        config_entry.version = 3
-
         # Purge deprecated config options.
 
         if v3_options.get("use_arm_code"):
@@ -251,7 +251,9 @@ async def async_migrate_entry(hass: HomeAssistant, config_entry: ConfigEntry) ->
         if v3_options.get("no_entry_delay"):
             v3_options["no_entry_delay"] = None
 
-        hass.config_entries.async_update_entry(config_entry, data={**config_entry.data}, options=v3_options)
+        hass.config_entries.async_update_entry(
+            config_entry, data={**config_entry.data}, options=v3_options, version=3
+        )
 
         LOGGER.info("Migration to version %s successful", config_entry.version)
 
@@ -283,9 +285,9 @@ async def async_migrate_entry(hass: HomeAssistant, config_entry: ConfigEntry) ->
                     v4_options[arm_mode].remove("delay")
                     v4_options[arm_mode].append(CONF_NO_ENTRY_DELAY)
 
-        config_entry.version = 4
-
-        hass.config_entries.async_update_entry(config_entry, data={**config_entry.data}, options=v4_options)
+        hass.config_entries.async_update_entry(
+            config_entry, data={**config_entry.data}, options=v4_options, version=4
+        )
 
         LOGGER.info("Migration to version %s successful", config_entry.version)
 

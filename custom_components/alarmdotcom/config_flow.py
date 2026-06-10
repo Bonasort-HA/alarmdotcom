@@ -80,7 +80,7 @@ class ADCFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):  # type: ignore
         config_entry: config_entries.ConfigEntry,
     ) -> ADCOptionsFlowHandler:
         """Tell Home Assistant that this integration supports configuration options."""
-        return ADCOptionsFlowHandler(config_entry)
+        return ADCOptionsFlowHandler()
 
     async def async_step_user(self, user_input: dict[str, Any] | None = None) -> FlowResult:
         """Gather configuration data when flow is initiated via the user interface."""
@@ -283,14 +283,20 @@ class ADCFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):  # type: ignore
 class ADCOptionsFlowHandler(config_entries.OptionsFlow):  # type: ignore
     """Handle option configuration via Integrations page."""
 
-    def __init__(self, config_entry: config_entries.ConfigEntry) -> None:
-        """Initialize options flow."""
-        self.config_entry = config_entry
-        self.options = dict(config_entry.options)
+    def __init__(self) -> None:
+        """Initialize options flow.
+
+        Since HA 2025.12, OptionsFlow.config_entry is a read-only property
+        provided by the base class and must not be assigned in __init__.
+        """
+        self.options: dict[str, Any] = {}
 
     async def async_step_init(self, user_input: dict[str, Any] | None = None) -> FlowResult:
         """First screen for configuration options. Sets arming code."""
         errors: dict = {}
+
+        if not self.options:
+            self.options = dict(self.config_entry.options)
 
         if user_input is not None:
             if user_input.get(CONF_ARM_CODE) == "CLEAR!":
