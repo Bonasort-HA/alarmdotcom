@@ -9,5 +9,5 @@
     "iot_class": "cloud_polling",
     "issue_tracker": "https://github.com/Educheylard/alarmdotcom/issues",
     "requirements": ["beautifulsoup4>=4.10.0", "pyalarmdotcomajax @ git+https://github.com/Educheylard/pyalarmdotcomajax@v0.5.13.1"],
-    "version": "3.0.14.2"
+    "version": "3.0.14.3"
 }

@@ -12,7 +12,7 @@ from typing import Any
 import aiohttp
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_PASSWORD, CONF_USERNAME
-from homeassistant.core import CALLBACK_TYPE, HomeAssistant
+from homeassistant.core import CALLBACK_TYPE, Event, HomeAssistant
 from homeassistant.exceptions import ConfigEntryAuthFailed, ConfigEntryNotReady
 from homeassistant.helpers.aiohttp_client import async_create_clientsession
 from homeassistant.helpers.event import async_track_time_interval
@@ -111,8 +111,13 @@ class AlarmIntegrationController:
                 interval=timedelta(seconds=KEEP_ALIVE_INTERVAL_SECONDS),
             )
 
-    async def stop(self) -> None:
-        """Stop the controller."""
+    async def stop(self, event: Event | None = None) -> None:
+        """Stop the controller.
+
+        Registered as an EVENT_HOMEASSISTANT_STOP listener, which calls this
+        with the event object; accept it (optional) to avoid a TypeError on
+        shutdown. Still callable with no args for direct invocation.
+        """
 
         self.stop_keep_alive()
         self.api.stop_websocket()
