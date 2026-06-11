@@ -4,10 +4,10 @@
     "codeowners": ["@uvjustin", "@elahd"],
     "config_flow": true,
     "dependencies": [],
-    "documentation": "https://github.com/BonasortCL/alarmdotcom",
+    "documentation": "https://github.com/Bonasort-HA/alarmdotcom",
     "integration_type": "hub",
     "iot_class": "cloud_polling",
-    "issue_tracker": "https://github.com/BonasortCL/alarmdotcom/issues",
-    "requirements": ["beautifulsoup4>=4.10.0", "pyalarmdotcomajax @ git+https://github.com/BonasortCL/pyalarmdotcomajax@v0.5.13.1"],
-    "version": "3.0.14.4"
+    "issue_tracker": "https://github.com/Bonasort-HA/alarmdotcom/issues",
+    "requirements": ["beautifulsoup4>=4.10.0", "pyalarmdotcomajax @ git+https://github.com/Bonasort-HA/pyalarmdotcomajax@v0.5.13.1"],
+    "version": "3.0.14.5"
 }
