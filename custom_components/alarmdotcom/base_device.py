@@ -62,7 +62,7 @@ class BaseDevice(CoordinatorEntity):  # type: ignore
         if (partition_id := self._device.partition_id) is not None:
             device_info["via_device"] = (DOMAIN, partition_id)
 
-        self._attr_device_info = DeviceInfo(device_info)
+        self._attr_device_info = DeviceInfo(**device_info)  # HA 2026.11: DeviceInfo is a keyword-only dataclass
 
     @property
     def device_type_name(self) -> str:
